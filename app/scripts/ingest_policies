@@ -1,0 +1,43 @@
+from app.db.session import SessionLocal, engine
+from app.db.base import Base
+from app.models.policy_document import PolicyDocument
+from app.services.embedding_service import EmbeddingService
+
+POLICIES = [
+    {
+        "title": "High Value Transaction Policy",
+        "content": "Transactions above $10,000 require manual fraud review.",
+    },
+    {
+        "title": "Geographic Risk Policy",
+        "content": "Transactions originating from high-risk geographies require escalation.",
+    },
+    {
+        "title": "AML Monitoring Policy",
+        "content": "Repeated cross-border transfers must trigger AML investigation.",
+    },
+]
+
+
+def ingest():
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+
+    for policy in POLICIES:
+        embedding = EmbeddingService.embed(policy["content"])
+
+        db.add(
+            PolicyDocument(
+                title=policy["title"],
+                content=policy["content"],
+                embedding=embedding,
+            )
+        )
+
+    db.commit()
+    db.close()
+    print("Policies ingested.")
+
+
+if __name__ == "__main__":
+    ingest()

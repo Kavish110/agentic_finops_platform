@@ -1,0 +1,54 @@
+import os
+from openai import OpenAI
+from typing import Dict, Any
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+
+class OpenAILLM:
+    MODEL = "gpt-4o-mini"
+
+    def generate(self, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
+        tools = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "lookup_transaction",
+                    "description": "Lookup transaction details",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "transaction_id": {"type": "string"},
+                        },
+                        "required": ["transaction_id"],
+                    },
+                },
+            }
+        ]
+
+        response = client.chat.completions.create(
+            model=self.MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            tools=tools,
+            tool_choice="auto",
+        )
+
+        message = response.choices[0].message
+
+        if message.tool_calls:
+            tool_call = message.tool_calls[0]
+            return {
+                "action": tool_call.function.name,
+                "arguments": tool_call.function.arguments,
+                "analysis": "Tool requested",
+                "confidence": 0.9,
+            }
+
+        return {
+            "analysis": message.content,
+            "action": "none",
+            "confidence": 0.5,
+        }

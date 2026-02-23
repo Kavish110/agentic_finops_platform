@@ -1,0 +1,40 @@
+import json
+from app.agents.planner import PlannerAgent
+# #region agent log
+import json as _json; open(r'd:\agentic_finops_platform\.cursor\debug.log', 'a').write(_json.dumps({"id":"log_orchestrator_before_import","timestamp":int(__import__('time').time()*1000),"location":"app/agents/orchestrator:3","message":"Before transaction_tool import","data":{},"runId":"run1","hypothesisId":"B"})+"\n")
+# #endregion
+try:
+    from app.tools.transaction_tool import TransactionLookupTool
+    # #region agent log
+    open(r'd:\agentic_finops_platform\.cursor\debug.log', 'a').write(_json.dumps({"id":"log_transaction_tool_imported","timestamp":int(__import__('time').time()*1000),"location":"app/agents/orchestrator:6","message":"transaction_tool imported successfully","data":{},"runId":"run1","hypothesisId":"B"})+"\n")
+    # #endregion
+except Exception as e:
+    # #region agent log
+    open(r'd:\agentic_finops_platform\.cursor\debug.log', 'a').write(_json.dumps({"id":"log_transaction_tool_import_error","timestamp":int(__import__('time').time()*1000),"location":"app/agents/orchestrator:8","message":"transaction_tool import failed","data":{"error_type":type(e).__name__,"error_message":str(e)},"runId":"run1","hypothesisId":"B"})+"\n")
+    # #endregion
+    raise
+
+
+class AgentOrchestrator:
+    def __init__(self):
+        self.planner = PlannerAgent()
+        self.tools = {
+            "lookup_transaction": TransactionLookupTool(),
+        }
+
+    def execute(self, user_input: str, transaction_id: str):
+        plan = self.planner.plan(user_input, transaction_id)
+
+        if plan["action"] == "none":
+            return plan
+
+        tool = self.tools.get(plan["action"])
+        args = json.loads(plan["arguments"])
+
+        result = tool.execute(args)
+
+        return {
+            "analysis": plan["analysis"],
+            "tool_result": result,
+            "confidence": plan["confidence"],
+        }

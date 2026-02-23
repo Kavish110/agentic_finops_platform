@@ -1,0 +1,45 @@
+import random
+from faker import Faker
+from uuid import uuid4
+from app.db.session import SessionLocal, engine
+from app.db.base import Base
+from app.models.transaction import Transaction
+
+fake = Faker()
+
+COUNTRIES = ["US", "UK", "DE", "IN", "CN", "BR", "NG"]
+
+
+def generate_transaction() -> Transaction:
+    amount = round(random.uniform(10, 20000), 2)
+    risk_score = round(random.uniform(0, 1), 2)
+
+    status = "Approved"
+    if amount > 10000 or risk_score > 0.8:
+        status = "Flagged"
+
+    return Transaction(
+        transaction_id=str(uuid4()),
+        user_id=str(uuid4()),
+        amount=amount,
+        merchant=fake.company(),
+        country=random.choice(COUNTRIES),
+        risk_score=risk_score,
+        status=status,
+    )
+
+
+def seed(n: int = 1000) -> None:
+    Base.metadata.create_all(bind=engine)
+
+    db = SessionLocal()
+    for _ in range(n):
+        db.add(generate_transaction())
+
+    db.commit()
+    db.close()
+    print(f"Seeded {n} transactions.")
+
+
+if __name__ == "__main__":
+    seed()

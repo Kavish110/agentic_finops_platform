@@ -1,0 +1,10 @@
+from pydantic import BaseSettings
+
+
+class Settings(BaseSettings):
+    environment: str = "development"
+    llm_provider: str = "mock"
+    enable_audit_logging: bool = True
+
+
+settings = Settings()

@@ -1,0 +1,15 @@
+import time
+import logging
+
+logger = logging.getLogger("observability")
+
+
+def track_latency(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        duration = time.time() - start
+        logger.info(f"{func.__name__} executed in {duration:.4f}s")
+        return result
+
+    return wrapper

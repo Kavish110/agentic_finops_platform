@@ -1,0 +1,14 @@
+from typing import Dict, Any
+from app.tools.base import BaseTool
+
+
+class TransactionLookupTool(BaseTool):
+    name = "lookup_transaction"
+
+    def execute(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "transaction_id": payload.get("transaction_id"),
+            "amount": 12000,
+            "location": "International",
+            "status": "Flagged",
+        }

@@ -1,0 +1,12 @@
+from app.agents.orchestrator import AgentOrchestrator
+
+
+class TransactionInvestigationWorkflow:
+    def __init__(self):
+        self.agent = AgentOrchestrator()
+
+    def run(self, transaction_id: str):
+        return self.agent.execute(
+            "Investigate suspicious transaction",
+            transaction_id,
+        )

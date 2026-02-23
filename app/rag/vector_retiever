@@ -1,0 +1,14 @@
+from sqlalchemy.orm import Session
+from app.services.embedding_service import EmbeddingService
+from app.repositories.policy_repository import PolicyRepository
+
+
+class VectorRetriever:
+    def __init__(self, db: Session):
+        self.db = db
+        self.repo = PolicyRepository(db)
+
+    def retrieve(self, query: str, limit: int = 5):
+        embedding = EmbeddingService.embed(query)
+        docs = self.repo.similarity_search(embedding, limit)
+        return [doc.content for doc in docs]

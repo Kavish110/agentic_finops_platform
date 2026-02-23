@@ -1,0 +1,8 @@
+
+from pydantic import BaseModel, Field
+
+
+class AgentResponse(BaseModel):
+    analysis: str
+    action: str
+    confidence: float = Field(ge=0, le=1)

@@ -1,0 +1,12 @@
+from typing import List
+
+
+class SimpleRetriever:
+    def __init__(self):
+        self.documents = [
+            "Policy: Transactions over $10,000 require review.",
+            "Policy: Location mismatches increase fraud risk.",
+        ]
+
+    def retrieve(self, query: str) -> List[str]:
+        return [doc for doc in self.documents if "Policy" in doc]

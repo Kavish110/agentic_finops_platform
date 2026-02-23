@@ -1,0 +1,11 @@
+from typing import Dict, Any
+from app.llm.base import BaseLLM
+
+
+class MockLLM(BaseLLM):
+    def generate(self, prompt: str) -> Dict[str, Any]:
+        return {
+            "analysis": "Transaction appears high-risk due to location anomaly.",
+            "action": "lookup_transaction",
+            "confidence": 0.87,
+        }

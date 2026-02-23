@@ -1,0 +1,37 @@
+from app.llm.openai_provider import OpenAILLM
+from app.db.session import SessionLocal
+# #region agent log
+import json; open(r'd:\agentic_finops_platform\.cursor\debug.log', 'a').write(json.dumps({"id":"log_planner_before_import","timestamp":int(__import__('time').time()*1000),"location":"app/agents/planner:3","message":"Before vector_retriever import","data":{},"runId":"run1","hypothesisId":"A"})+"\n")
+# #endregion
+try:
+    from app.rag.vector_retriever import VectorRetriever
+    # #region agent log
+    open(r'd:\agentic_finops_platform\.cursor\debug.log', 'a').write(json.dumps({"id":"log_vector_retriever_imported","timestamp":int(__import__('time').time()*1000),"location":"app/agents/planner:6","message":"vector_retriever imported successfully","data":{},"runId":"run1","hypothesisId":"A"})+"\n")
+    # #endregion
+except Exception as e:
+    # #region agent log
+    open(r'd:\agentic_finops_platform\.cursor\debug.log', 'a').write(json.dumps({"id":"log_vector_retriever_import_error","timestamp":int(__import__('time').time()*1000),"location":"app/agents/planner:8","message":"vector_retriever import failed","data":{"error_type":type(e).__name__,"error_message":str(e)},"runId":"run1","hypothesisId":"A"})+"\n")
+    # #endregion
+    raise
+
+
+class PlannerAgent:
+    def __init__(self):
+        self.llm = OpenAILLM()
+
+    def plan(self, user_input: str, transaction_id: str):
+        db = SessionLocal()
+        retriever = VectorRetriever(db)
+
+        policies = retriever.retrieve(user_input, limit=3)
+
+        system_prompt = f"""
+You are a financial risk agent.
+Use the following compliance policies:
+{policies}
+"""
+
+        return self.llm.generate(
+            system_prompt=system_prompt,
+            user_prompt=f"{user_input} for transaction {transaction_id}",
+        )

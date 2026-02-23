@@ -1,0 +1,10 @@
+
+from app.config import settings
+from app.llm.mock_provider import MockLLM
+from app.llm.base import BaseLLM
+
+
+def get_llm() -> BaseLLM:
+    if settings.llm_provider == "mock":
+        return MockLLM()
+    raise ValueError("Unsupported LLM provider")

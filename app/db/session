@@ -1,0 +1,14 @@
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+# #region agent log
+import json; open(r'd:\agentic_finops_platform\.cursor\debug.log', 'a').write(json.dumps({"id":"log_db_session_init","timestamp":int(__import__('time').time()*1000),"location":"app/db/session:5","message":"DATABASE_URL check","data":{"database_url_set":DATABASE_URL is not None,"database_url_length":len(DATABASE_URL) if DATABASE_URL else 0},"runId":"run1","hypothesisId":"C"})+"\n")
+# #endregion
+
+engine = create_engine(DATABASE_URL, echo=False)
+# #region agent log
+open(r'd:\agentic_finops_platform\.cursor\debug.log', 'a').write(json.dumps({"id":"log_engine_created","timestamp":int(__import__('time').time()*1000),"location":"app/db/session:8","message":"Engine created","data":{"engine_created":True},"runId":"run1","hypothesisId":"C"})+"\n")
+# #endregion
+SessionLocal = sessionmaker(bind=engine)

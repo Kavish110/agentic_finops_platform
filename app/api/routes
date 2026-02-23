@@ -1,0 +1,17 @@
+from fastapi import APIRouter
+from pydantic import BaseModel
+from app.workflows.transaction_investigation import (
+    TransactionInvestigationWorkflow,
+)
+
+router = APIRouter()
+workflow = TransactionInvestigationWorkflow()
+
+
+class InvestigationRequest(BaseModel):
+    transaction_id: str
+
+
+@router.post("/investigate")
+def investigate(request: InvestigationRequest):
+    return workflow.run(request.transaction_id)
