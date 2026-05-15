@@ -20,4 +20,4 @@ This project demonstrates how to build regulated, auditable, and scalable agenti
 
 ---
 
-## 🏗 Architecture
+
